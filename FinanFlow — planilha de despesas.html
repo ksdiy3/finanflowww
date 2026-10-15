@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FinanFlow — planilha de despesas</title>
+<meta name="description" content="Planilha de controle de despesas. Você anota o gasto, ela faz a soma. R$ 9,99, pagamento único.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#FBFBF8;--ink:#1F2A37;--muted:#5B6673;--line:#D5DAD1;--cell:#FFFFFF;--head:#EEF1EA;--hl:#FFE27A;--btn:#14803F;color-scheme:light;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#14181C;--ink:#E8ECEF;--muted:#9AA5B1;--line:#2D353D;--cell:#1B2025;--head:#222930;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#14181C;--ink:#E8ECEF;--muted:#9AA5B1;--line:#2D353D;--cell:#1B2025;--head:#222930;color-scheme:dark}
+html{background:var(--paper);scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 1.0625rem/1.55 "Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:84px}
+a{color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+header .wrap{display:flex;justify-content:space-between;align-items:center;height:64px}
+.logo{font-weight:800;font-size:1.25rem;letter-spacing:-.02em;text-decoration:none}
+.btn{display:inline-block;background:var(--btn);color:#fff;font-weight:700;text-decoration:none;padding:15px 26px;border-radius:6px;text-align:center}
+.btn:hover{background:#0F6A33}
+.btn:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.btn.sm{padding:9px 16px;font-size:.9375rem}
+.hero{display:grid;gap:36px;padding:28px 0 56px}
+h1{font-size:clamp(2.2rem,7vw,3.7rem);line-height:1.04;letter-spacing:-.025em;font-weight:800;margin:0 0 18px;max-width:14ch}
+.lead{max-width:46ch;color:var(--muted);margin:0 0 26px}
+.price{display:flex;align-items:center;gap:18px;margin-bottom:22px}
+.cell{position:relative;background:var(--hl);color:#1F2A37;border:2px solid var(--ink);font-weight:800;font-size:2.4rem;letter-spacing:-.02em;line-height:1;padding:10px 16px}
+.cell::after{content:"";position:absolute;right:-6px;bottom:-6px;width:9px;height:9px;background:var(--ink)}
+.price span:last-child{color:var(--muted);line-height:1.35;font-size:.9375rem}
+.note{font-size:.9375rem;color:var(--muted);margin:14px 0 0;max-width:42ch}
+.sheet{border:1px solid var(--line);background:var(--cell);overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;width:100%;min-width:430px;font-variant-numeric:tabular-nums;font-size:.9375rem}
+th,td{border:1px solid var(--line);padding:0 12px;height:42px;text-align:left;white-space:nowrap}
+th{background:var(--head);font-weight:700;font-size:.8125rem;color:var(--muted)}
+td.n,th.n{text-align:right}
+tfoot td{background:var(--head);font-weight:800;border-top:2px solid var(--ink)}
+.v{font:inherit;width:100%;text-align:right;border:0;background:transparent;color:inherit;padding:0;height:40px}
+.v::placeholder{color:var(--muted)}
+.cap{font-size:.875rem;color:var(--muted);margin:10px 0 0}
+section.blk{border-top:1px solid var(--line);padding:56px 0}
+h2{font-size:clamp(1.5rem,4vw,2.1rem);line-height:1.15;letter-spacing:-.02em;margin:0 0 28px;max-width:20ch}
+.cols{display:grid;gap:0;grid-template-columns:1fr}
+.row{display:grid;gap:6px;padding:18px 0;border-top:1px solid var(--line)}
+.row:last-child{border-bottom:1px solid var(--line)}
+.row h3{margin:0;font-size:1.125rem}
+.row p{margin:0;color:var(--muted);max-width:52ch}
+ol{list-style:none;margin:0;padding:0;display:grid;gap:14px;max-width:52ch}
+ol li{display:grid;grid-template-columns:32px 1fr;align-items:start}
+ol li b{display:grid;place-items:center;width:26px;height:26px;border:2px solid var(--ink);font-size:.875rem}
+.final{background:var(--ink);color:var(--paper)}
+.final h2{max-width:22ch}
+.final .btn{background:var(--hl);color:#1F2A37}
+.final .btn:hover{background:#FFD84D}
+footer{padding:26px 0;color:var(--muted);font-size:.875rem}
+.bar{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--paper);border-top:1px solid var(--line);padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px));z-index:5}
+.bar strong{font-size:1.25rem;letter-spacing:-.01em}
+.bar small{display:block;color:var(--muted);font-size:.8125rem;line-height:1.2}
+@media (min-width:860px){
+ body{padding-bottom:0}.bar{display:none}
+ .hero{grid-template-columns:1fr 1.1fr;gap:64px;align-items:center;padding:64px 0 84px}
+ .row{grid-template-columns:260px 1fr;gap:32px}
+}
+</style>
+</head>
+<body>
+<header><div class="wrap"><a class="logo" href="#">FinanFlow</a><a class="btn sm" href="#comprar">Comprar por R$ 9,99</a></div></header>
+
+<main>
+<div class="wrap hero">
+ <div>
+  <h1>Anote o gasto. A planilha faz a conta.</h1>
+  <p class="lead">Controle de despesas por semana ou por mês. Você escreve o local, o nome e o valor, e o total aparece sozinho. Sem fórmula para montar e sem mensalidade.</p>
+  <div class="price" id="comprar"><span class="cell">R$ 9,99</span><span>Pagamento único.<br>Sem mensalidade.</span></div>
+  <a class="btn" href="https://wa.me/5511947565834?text=Ol%C3%A1!%20Quero%20comprar%20a%20Planilha%20FinanFlow%20por%20R%24%209%2C99.">Comprar pelo WhatsApp</a>
+  <p class="note">Você recebe o link da planilha e o guia em PDF direto na conversa.</p>
+ </div>
+ <div>
+  <div class="sheet">
+   <table>
+    <thead><tr><th>Dia</th><th>Onde</th><th>O que</th><th class="n">Valor (R$)</th></tr></thead>
+    <tbody>
+     <tr><td>Seg</td><td>Mercado</td><td>Compras da semana</td><td><input class="v" value="182,40" inputmode="decimal" aria-label="Valor de segunda"></td></tr>
+     <tr><td>Ter</td><td>Posto</td><td>Gasolina</td><td><input class="v" value="120,00" inputmode="decimal" aria-label="Valor de terça"></td></tr>
+     <tr><td>Qua</td><td>Farmácia</td><td>Remédio</td><td><input class="v" value="38,50" inputmode="decimal" aria-label="Valor de quarta"></td></tr>
+     <tr><td>Qui</td><td>Padaria</td><td>Café da manhã</td><td><input class="v" value="14,90" inputmode="decimal" aria-label="Valor de quinta"></td></tr>
+     <tr><td>Sex</td><td>Delivery</td><td>Jantar</td><td><input class="v" placeholder="0,00" inputmode="decimal" aria-label="Valor de sexta"></td></tr>
+    </tbody>
+    <tfoot><tr><td colspan="3">Total da semana</td><td class="n" id="total">R$ 0,00</td></tr></tfoot>
+   </table>
+  </div>
+  <p class="cap">Teste aqui: digite um valor na sexta e veja o total mudar.</p>
+ </div>
+</div>
+
+<section class="blk"><div class="wrap">
+ <h2>O que vem na sua planilha</h2>
+ <div class="cols">
+  <div class="row"><h3>Soma automática</h3><p>Em cada tópico existe o campo R$ 0,00. Escreva o nome do gasto, o local e o valor. A planilha soma para você.</p></div>
+  <div class="row"><h3>Semana ou mês</h3><p>As despesas vêm organizadas por semana. Para controlar por mês, basta trocar as datas.</p></div>
+  <div class="row"><h3>Guia rápido em PDF</h3><p>Mostra como criar a sua cópia e usar cada parte da planilha em poucos passos.</p></div>
+  <div class="row"><h3>Sua cópia, para sempre</h3><p>O arquivo fica com você. Não expira e não depende de assinatura.</p></div>
+ </div>
+</div></section>
+
+<section class="blk"><div class="wrap">
+ <h2>Como comprar</h2>
+ <ol>
+  <li><b>1</b><span>Toque no botão e envie a mensagem que já vem pronta no WhatsApp.</span></li>
+  <li><b>2</b><span>Receba o link da planilha e o guia em PDF.</span></li>
+  <li><b>3</b><span>Faça a sua cópia e anote o primeiro gasto.</span></li>
+ </ol>
+</div></section>
+
+<section class="blk final"><div class="wrap">
+ <h2>Comece a anotar hoje por R$ 9,99.</h2>
+ <a class="btn" href="https://wa.me/5511947565834?text=Ol%C3%A1!%20Quero%20comprar%20a%20Planilha%20FinanFlow%20por%20R%24%209%2C99.">Comprar pelo WhatsApp</a>
+</div></section>
+</main>
+
+<footer><div class="wrap">© 2026 FinanFlow. Todos os direitos reservados.</div></footer>
+
+<div class="bar"><div><strong>R$ 9,99</strong><small>Pagamento único</small></div><a class="btn sm" href="https://wa.me/5511947565834?text=Ol%C3%A1!%20Quero%20comprar%20a%20Planilha%20FinanFlow%20por%20R%24%209%2C99.">Comprar pelo WhatsApp</a></div>
+
+<script>
+const inputs=document.querySelectorAll('.v'),total=document.getElementById('total');
+const parse=s=>{s=String(s);if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');return parseFloat(s)||0};
+const sum=()=>{total.textContent=[...inputs].reduce((a,i)=>a+parse(i.value),0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})};
+inputs.forEach(i=>{i.addEventListener('input',sum);i.addEventListener('blur',()=>{if(i.value.trim())i.value=parse(i.value).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})})});
+sum();
+</script>
+</body>
+</html>
